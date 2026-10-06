@@ -1,9 +1,14 @@
 import streamlit as st
 from pypdf import PdfReader
+from dotenv import load_dotenv
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+import os
+
+load_dotenv()
 
 st.set_page_config(page_title="AI Assistant", page_icon="🤖")
-st.title("AI Assistant - Test 2")
-st.caption("Testing PDF file text extraction")
+st.title("AI Assistant - Test 3")
+st.caption("Testing Google API Connection & Embeddings Generation")
 
 with st.sidebar:
     st.header("1. Document")
@@ -19,6 +24,9 @@ def extract_text(pdf_file) -> str:
             text += extracted + "\n"
         return text
 
+
+
+
 if uploaded_file != None:
     st.success(f"Uploading done: {uploaded_file.name}")
 
@@ -26,12 +34,40 @@ if uploaded_file != None:
         pdf_text = extract_text(uploaded_file)
 
     if pdf_text.strip():
-        st.subheader("Extracted text:")
-        with st.expander("View Content"):
-            st.text_area("",value=pdf_text, height = 400)
+        st.subheader("Testing Google Gemini API Connection")
+
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            st.error("api key not found in env file")
+        else:
+            st.info("API Key was found.")
+
+            if st.button("Generate test embedding"):
+                with st.spinner("Sending request to Google API..."):
+                    try:
+                        text = pdf_text[:300]
+                        # Get valid embedding model
+                        embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
+                        vector = embeddings.embed_query(text)
+
+                        st.success("Success! Got vector from Google API")
+
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.metric(label="Vector's length", value=len(vector))
+                        with col2:
+                            st.metric(label="Model", value="gemini-embedding-001")
+                        with st.expander("View of the first 10 values of Vector"):
+                            st.write(vector[:10])
+
+                    except Exception as e:
+                        st.error(f"Error connecting to Google API: {e}")
+
     else:
         st.warning("Could not read document.")
+
 else:
     st.info("Insert PDF file to test")
+    
 
 
