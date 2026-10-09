@@ -28,3 +28,16 @@ The app uses LangChain to split PDFs into smaller text chunks, converts them int
    ```bash
    git clone git@github.com:konradszp/AI_Assistant.git
    cd AI_Assistant
+   ```
+2. **Add API key**
+    Make a .env file and add API key generated on Google AI Studio
+    ```bash
+    GOOGLE_API_KEY=google_gemini_api_key
+    ```
+3. **Start with docker compose**
+    ```bash
+    docker-compose up --build
+    ```
+4. **Open in browser**
+    Go to http://localhost:8501 to test the app
+
